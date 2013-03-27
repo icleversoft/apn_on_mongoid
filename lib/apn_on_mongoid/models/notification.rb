@@ -13,23 +13,12 @@ module APN
     field :device_language
     field :errors_nb
 
-    referenced_in :subscription, :class_name => "APN::Subscription"
+    belongs_to :subscription, :class_name => "APN::Subscription"
+    belongs_to :device, :class_name => 'APN::Device'
+    has_one :application, :class_name => 'APN::Application'
     
     before_save :truncate_alert
     
-    # Returns the device from the subscription association
-    def device
-      self.subscription.device
-    end
-    
-    # Gets the subscription which is embedded in the device collection.
-    #
-    # This will have to do until Mongoid implements a better search for
-    # embeded items.
-    def subscription
-      device = APN::Device.where(:subscriptions => {'$elemMatch' => { :_id => self.subscription_id }}).first
-      device.subscriptions.where(:_id => self.subscription_id).first
-    end
     
     # Stores the text alert message you want to send to the device.
     # 
